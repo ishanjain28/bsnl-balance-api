@@ -232,7 +232,7 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://market.mashape.com/bsnl-balance", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, "https://market.mashape.com/ishanjain28/bsnl-balance-stats", http.StatusTemporaryRedirect)
 }
 
 func fetchPrepaidCircles() (*PrepaidCircles, error) {
