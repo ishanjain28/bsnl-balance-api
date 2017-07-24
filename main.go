@@ -84,6 +84,12 @@ type BsnlFailure struct {
 	REMARKS string `json:"REMARKS"`
 }
 
+type Response struct {
+	Status  string `json:"status"`
+	Balance string `json:"balance"`
+	Expiry  string `json:"expiry"`
+}
+
 func init() {
 	var err error
 	POC, err = fetchPostpaidCircles()
@@ -141,7 +147,7 @@ func createBSNLRequest(phoneno, cCode string) (*BsnlRequest, error) {
 	breq.PREPAIDNO = phoneno
 
 	for _, v := range PRC.ROWSET.ROW {
-		if strings.ToLower(v.CIRCLECODE) == strings.ToLower(cCode) {
+		if strings.ToLower(v.CIRCLECODE) == strings.ToLower(cCode) || strings.ToLower(v.CIRCLENAME) == strings.ToLower(cCode) {
 			breq.ZONECODE = v.ZONECODE
 			breq.CIRCLECODE = v.CIRCLECODE
 			breq.CIRCLEID = v.CIRCLEID
@@ -157,6 +163,12 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 	phone := v["phone"]
 	cCode := v["circle-code"]
 
+	if phone == "" || cCode == "" {
+		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+		return
+	}
+
+	//Create a request
 	breq, err := createBSNLRequest(phone, cCode)
 	if err != nil {
 		log.Println("Error in creating request", err.Error())
@@ -171,28 +183,35 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	//Url encode it
 	reqData := []byte(url.PathEscape("postData=" + string(t)))
 
+	//Create a new request
 	req, err := http.NewRequest("POST", "https://portal2.bsnl.in/myportal/validatepprequest.do", bytes.NewBuffer(reqData))
 
+	//Set proper headers, so they don't reject our request
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Origin", "https://portal2.bsnl.in")
 	req.Header.Set("Referer", "https://portal2.bsnl.in/myportal/workspace.do")
 
+	//Create a customised http transport to accept insecure certs
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true },
 	}
 	client := &http.Client{Transport: tr}
 
-	resp, err := client.Do(req)
+	//make request
+	apiResp, err := client.Do(req)
 
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Println("Error in making request", err.Error())
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 
-	rData, _ := ioutil.ReadAll(resp.Body)
+	rData, _ := ioutil.ReadAll(apiResp.Body)
 
-	if strings.Index(string(rData), "SUCCESS") {
+	if strings.Index(string(rData), "SUCCESS") != -1 {
 		bs := &BsnlSucess{}
 		err = json.Unmarshal(rData, bs)
 
@@ -202,17 +221,18 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		bs.
-	} else {
-		bf := &BsnlFailure{}
-		err = json.Unmarshal(rData, bf)
+		bal := strings.Split(bs.BALANCE, "And")[0]
+		exp := bs.BALANCE[strings.LastIndex(bs.BALANCE, " "):]
 
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println(err.Error())
-			return
-		}
+		resp := Response{Expiry: exp, Balance: bal, Status: "OK"}
+
+		respb, _ := json.Marshal(resp)
+
+		w.Write(respb)
+		return
 	}
+
+	http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 
 }
 
