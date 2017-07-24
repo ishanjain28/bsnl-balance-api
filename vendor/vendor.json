@@ -1,0 +1,79 @@
+{
+  "comment": "",
+  "ignore": "test",
+  "heroku": {
+    "goVersion": "go1.8"
+  },
+  "package": [
+    {
+      "checksumSHA1": "AANTVr9CVVyzsgviODY6Wi2thuM=",
+      "path": "github.com/fatih/color",
+      "revision": "62e9147c64a1ed519147b62a56a14e83e2be02c1",
+      "revisionTime": "2017-05-23T20:24:04Z"
+    },
+    {
+      "checksumSHA1": "/ceykh0YXRliwF/53aCGOkypxTc=",
+      "path": "github.com/getlantern/context",
+      "revision": "624d99b1798d7c5375ea1d3ca4c5b04d58f7c775",
+      "revisionTime": "2016-05-25T11:20:39Z"
+    },
+    {
+      "checksumSHA1": "QHGMYIUpkHOvL6uk2X2fBWQ1aI4=",
+      "path": "github.com/getlantern/errors",
+      "revision": "99fa440517e8f3d1e4cd8d6dbed6b41f4c1ed3d6",
+      "revisionTime": "2016-08-29T16:49:57Z"
+    },
+    {
+      "checksumSHA1": "m9pSLobd5Twnq5M/TjDEhohwgDU=",
+      "path": "github.com/getlantern/hex",
+      "revision": "083fba3033ad473db3dd31c9bb368473d37581a7",
+      "revisionTime": "2016-05-23T04:38:25Z"
+    },
+    {
+      "checksumSHA1": "sEFcxs9+qJk36tozLDbZW+dDJr8=",
+      "path": "github.com/getlantern/hidden",
+      "revision": "d52a649ab33af200943bb599898dbdcfdbc94cb7",
+      "revisionTime": "2016-05-23T04:38:07Z"
+    },
+    {
+      "checksumSHA1": "n4/IVAHqTmfk3cMwrcMKZEkQHFQ=",
+      "path": "github.com/getlantern/ops",
+      "revision": "b70875f5d689a9438bca72aefd7142a2af889b18",
+      "revisionTime": "2016-06-07T13:28:00Z"
+    },
+    {
+      "checksumSHA1": "XBaMOzfkz20QLaqv35016/zfQTs=",
+      "path": "github.com/getlantern/stack",
+      "revision": "02f928aad224fbccd50d66edd776fc9d1e9f2f2b",
+      "revisionTime": "2016-05-16T00:17:42Z"
+    },
+    {
+      "checksumSHA1": "zmCk+lgIeiOf0Ng9aFP9aFy8ksE=",
+      "path": "github.com/gorilla/mux",
+      "revision": "4c1c3952b7d9d0a061a3fa7b36fd373ba0398ebc",
+      "revisionTime": "2017-04-27T04:12:50Z"
+    },
+    {
+      "checksumSHA1": "MrqRXuqj5suGXqcRUUwi+YA7PmE=",
+      "origin": "github.com/fatih/color/vendor/github.com/mattn/go-colorable",
+      "path": "github.com/mattn/go-colorable",
+      "revision": "62e9147c64a1ed519147b62a56a14e83e2be02c1",
+      "revisionTime": "2017-05-23T20:24:04Z"
+    },
+    {
+      "checksumSHA1": "a/chskqRYBBHS8lDTpB3FQqgHb8=",
+      "origin": "github.com/fatih/color/vendor/github.com/mattn/go-isatty",
+      "path": "github.com/mattn/go-isatty",
+      "revision": "62e9147c64a1ed519147b62a56a14e83e2be02c1",
+      "revisionTime": "2017-05-23T20:24:04Z"
+    },
+    {
+      "checksumSHA1": "oBjdFvDUZpioGsB6URqe16hDQUg=",
+      "origin": "github.com/fatih/color/vendor/golang.org/x/sys/unix",
+      "path": "golang.org/x/sys/unix",
+      "revision": "62e9147c64a1ed519147b62a56a14e83e2be02c1",
+      "revisionTime": "2017-05-23T20:24:04Z"
+    }
+  ],
+  "rootPath": "github.com/ishanjain28/bsnl-balance-api"
+}
