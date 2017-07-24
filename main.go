@@ -4,12 +4,10 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"os"
-	"log"
 	"time"
 	"strconv"
 	"encoding/json"
 	"io/ioutil"
-	"fmt"
 	"github.com/getlantern/errors"
 	"crypto/tls"
 	"strings"
@@ -79,11 +77,6 @@ type BsnlSucess struct {
 	BALANCE string `json:"BALANCE"`
 }
 
-type BsnlFailure struct {
-	STATUS  string `json:"STATUS"`
-	REMARKS string `json:"REMARKS"`
-}
-
 type Response struct {
 	Status  string `json:"status"`
 	Balance string `json:"balance"`
@@ -92,14 +85,14 @@ type Response struct {
 
 func init() {
 	var err error
-	POC, err = fetchPostpaidCircles()
-	if err != nil {
-		log.Println("Error in fetching postpaid circles", err.Error())
-	}
+	//POC, err = fetchPostpaidCircles()
+	//if err != nil {
+	//	Error.Println("Error in fetching postpaid circles", err.Error())
+	//}
 
 	PRC, err = fetchPrepaidCircles()
 	if err != nil {
-		log.Println("Error in fetching prepaid circles", err.Error())
+		Error.Fatalln("Error in fetching prepaid circles", err.Error())
 	}
 }
 
@@ -107,7 +100,7 @@ func main() {
 
 	PORT := os.Getenv("PORT")
 	if PORT == "" {
-		log.Fatalln("$PORT not set")
+		Error.Fatalln("$PORT not set")
 	}
 
 	router := mux.NewRouter()
@@ -116,7 +109,7 @@ func main() {
 
 	router.HandleFunc("/", homeHandler)
 
-	fmt.Println("Starting Server on", PORT)
+	Info.Println("Starting Server on", PORT)
 	http.ListenAndServe(":"+PORT, router)
 }
 
@@ -171,14 +164,14 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 	//Create a request
 	breq, err := createBSNLRequest(phone, cCode)
 	if err != nil {
-		log.Println("Error in creating request", err.Error())
+		Warn.Println("Error in creating BSNL request Data", err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
 
 	t, err := json.Marshal(breq)
 	if err != nil {
-		log.Println("Error in marshalling", err.Error())
+		Warn.Println("Error in marshalling", err.Error())
 		http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 		return
 	}
@@ -188,7 +181,11 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 
 	//Create a new request
 	req, err := http.NewRequest("POST", "https://portal2.bsnl.in/myportal/validatepprequest.do", bytes.NewBuffer(reqData))
-
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		Warn.Println("Error in craeting request", err.Error())
+		return
+	}
 	//Set proper headers, so they don't reject our request
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Origin", "https://portal2.bsnl.in")
@@ -204,7 +201,7 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 	apiResp, err := client.Do(req)
 
 	if err != nil {
-		log.Println("Error in making request", err.Error())
+		Warn.Println("Error in making request", err.Error())
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
@@ -217,16 +214,14 @@ func fetchBalance(w http.ResponseWriter, r *http.Request) {
 
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			log.Println(err.Error())
+			Warn.Println("Error in unmarshalling", err.Error())
 			return
 		}
 
 		bal := strings.Split(bs.BALANCE, "And")[0]
 		exp := bs.BALANCE[strings.LastIndex(bs.BALANCE, " "):]
 
-		resp := Response{Expiry: exp, Balance: bal, Status: "OK"}
-
-		respb, _ := json.Marshal(resp)
+		respb, _ := json.Marshal(Response{Expiry: exp, Balance: bal, Status: "OK"})
 
 		w.Write(respb)
 		return
